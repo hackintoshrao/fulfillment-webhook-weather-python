@@ -53,6 +53,7 @@ def processRequest(req):
     req_dict = json.loads(request.data)
     entity_type = ""
     entity_value = ""
+    speech = ""
     # Accessing the fields on the POST request boduy of API.ai invocation of the webhook
     intent = req_dict["result"]["metadata"]["intentName"]
 
@@ -61,8 +62,22 @@ def processRequest(req):
 	    entity_value = entity_key_val[key]
 	    entity_type = key 
     
-    # constructing the resposne string.
-    speech = "Hey, Got your request, Responding from webhook " + "The Intent is: " + intent + ": The entity type is: " + entity_type + ": The entity value is: " + entity_value  
+    # constructing the resposne string based on intent and the entity.
+    if intent == "Platform exploration help":
+	    if entity_type == "features":
+		    if entity_value == "goals":
+			    speech = """Here are the steps to update the goals: First, select the project (from the carousel) > click on an objective > update goals. i
+			                Here you can drag the seeker to update the progress and then pick the date to assign the progress to that specific date. 
+					Then hit save to record your progress."""
+                    elif entity_value == "sign out":
+			    speech = """Here are the steps to signout: Go to top right icon > profile > sign out and then click on it."""
+                    else:
+			    speech = """Currently I can only help you with udpating the goals and signing out. I could do more as I evolve."""
+
+    else:
+           speech = """Currently I can only help you with navigating to udpate the goals and signing out. I could do more as I evolve."""
+
+    
     res = makeWebhookResult(speech)
     return res
 
